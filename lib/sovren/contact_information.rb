@@ -25,7 +25,7 @@ module Sovren
       mobile_phones = contact_information.css('Mobile FormattedNumber').map { |m| { type: 'mobile', number: m.text } } rescue []
       fax_phones = contact_information.css('Fax FormattedNumber').map { |m| { type: 'fax', number: m.text } } rescue []
 
-      other_phone_nodes = contact_information.css('ContactMethod').select { |node| node.css('Telephone').present? } rescue []
+      other_phone_nodes = contact_information.css('ContactMethod').select { |node| node.css('Telephone').length > 0 } rescue []
       other_phones = parse_other_phone_types(other_phone_nodes)
 
       result.phone_numbers.concat(mobile_phones)
