@@ -26,8 +26,7 @@ module Sovren
       fax_phones = contact_information.css('Fax FormattedNumber').map { |m| { type: 'fax', number: m.text } } rescue nil
 
       other_phone_nodes = contact_information.css('ContactMethod')&.select { |node| node.css('Telephone').present? }
-      home_phones = parse_phones_of_type('home', other_phone_nodes) if other_phone_nodes.present?
-      work_phones = parse_phones_of_type('office', other_phone_nodes) if other_phone_nodes.present?
+      parse_other_phone_types(result, other_phone_nodes) if other_phone_nodes.present?
 
       result.phone_numbers.concat(mobile_phones) if mobile_phones.present?
       result.phone_numbers.concat(fax_phones) if fax_phones.present?
@@ -40,15 +39,22 @@ module Sovren
       result
     end
 
-    def self.parse_phones_of_type(type, phone_nodes)
-      type_mappings = {
-        home: 'home',
-        office: 'work'
-      }
-      matching_phone_nodes = phone_nodes.select { |node| node.css('Location')&.text == type }
-      number_nodes = matching_phone_nodes.map { |node| node.css('FormattedNumber') }
-      v3_type = type_mappings[type.to_sym]
-      number_nodes.map { |n| { type: v3_type, number: n.text } }
+    def self.work_phone?(node)
+      node.css('Location')&.text == 'office'
+    end
+
+    def self.formatted_number_from_node(node)
+      node.css('FormattedNumber')&.text
+    end
+
+    def self.parse_other_phone_types(result, phone_nodes)
+      phone_nodes.map do |node|
+        if work_phone?(node)
+          { type: 'work', number: formatted_number_from_node(node) }
+        else
+          { type: 'home', number: formatted_number_from_node(node) }
+        end
+      end
     end
   end
 end
