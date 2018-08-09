@@ -22,15 +22,15 @@ module Sovren
       result.country = contact_information.css('PostalAddress').first.css('CountryCode').text rescue nil
 
       result.phone_numbers = []
-      mobile_phones = contact_information.css('Mobile FormattedNumber').map { |m| { type: 'mobile', number: m.text } } rescue nil
-      fax_phones = contact_information.css('Fax FormattedNumber').map { |m| { type: 'fax', number: m.text } } rescue nil
+      mobile_phones = contact_information.css('Mobile FormattedNumber').map { |m| { type: 'mobile', number: m.text } } rescue []
+      fax_phones = contact_information.css('Fax FormattedNumber').map { |m| { type: 'fax', number: m.text } } rescue []
 
-      other_phone_nodes = contact_information.css('ContactMethod')&.select { |node| node.css('Telephone').present? }
-      other_phones = parse_other_phone_types(other_phone_nodes) if other_phone_nodes.present?
+      other_phone_nodes = contact_information.css('ContactMethod').select { |node| node.css('Telephone').present? } rescue []
+      other_phones = parse_other_phone_types(other_phone_nodes)
 
-      result.phone_numbers.concat(mobile_phones) if mobile_phones.present?
-      result.phone_numbers.concat(fax_phones) if fax_phones.present?
-      result.phone_numbers.concat(other_phones) if other_phones.present?
+      result.phone_numbers.concat(mobile_phones)
+      result.phone_numbers.concat(fax_phones)
+      result.phone_numbers.concat(other_phones)
 
       result.websites = contact_information.css('InternetWebAddress').map(&:text) rescue nil
       result.email_addresses = contact_information.css('InternetEmailAddress').map(&:text) rescue nil
