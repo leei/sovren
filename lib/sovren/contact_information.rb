@@ -26,12 +26,11 @@ module Sovren
       fax_phones = contact_information.css('Fax FormattedNumber').map { |m| { type: 'fax', number: m.text } } rescue nil
 
       other_phone_nodes = contact_information.css('ContactMethod')&.select { |node| node.css('Telephone').present? }
-      parse_other_phone_types(result, other_phone_nodes) if other_phone_nodes.present?
+      other_phones = parse_other_phone_types(other_phone_nodes) if other_phone_nodes.present?
 
       result.phone_numbers.concat(mobile_phones) if mobile_phones.present?
       result.phone_numbers.concat(fax_phones) if fax_phones.present?
-      result.phone_numbers.concat(home_phones) if home_phones.present?
-      result.phone_numbers.concat(work_phones) if work_phones.present?
+      result.phone_numbers.concat(other_phones) if other_phones.present?
 
       result.websites = contact_information.css('InternetWebAddress').map(&:text) rescue nil
       result.email_addresses = contact_information.css('InternetEmailAddress').map(&:text) rescue nil
@@ -47,7 +46,7 @@ module Sovren
       node.css('FormattedNumber')&.text
     end
 
-    def self.parse_other_phone_types(result, phone_nodes)
+    def self.parse_other_phone_types(phone_nodes)
       phone_nodes.map do |node|
         if work_phone?(node)
           { type: 'work', number: formatted_number_from_node(node) }
