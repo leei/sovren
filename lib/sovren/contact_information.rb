@@ -1,6 +1,6 @@
 module Sovren
   class ContactInformation
-    attr_accessor :first_name, :middle_name, :last_name, :aristocratic_title, :form_of_address, :generation, :qualification, :address_line_1, :address_line_2, :city, :state, :country, :postal_code, :home_phone, :mobile_phone, :email, :websites
+    attr_accessor :first_name, :middle_name, :last_name, :aristocratic_title, :form_of_address, :generation, :qualification, :address_line_1, :address_line_2, :city, :state, :country, :postal_code, :phone_numbers, :email_addresses, :websites
 
     def self.parse(contact_information)
       return nil if contact_information.nil?
