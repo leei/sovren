@@ -17,10 +17,9 @@ describe Sovren::ContactInformation do
   Then { contact_information.should respond_to :country }
   Then { contact_information.should respond_to :postal_code }
 
-  Then { contact_information.should respond_to :home_phone }
-  Then { contact_information.should respond_to :mobile_phone }
+  Then { contact_information.should respond_to :phone_numbers }
 
-  Then { contact_information.should respond_to :email }
+  Then { contact_information.should respond_to :email_addresses }
   Then { contact_information.should respond_to :websites }
 
   context ".parse" do
@@ -45,13 +44,14 @@ describe Sovren::ContactInformation do
       Then { result.postal_code == "92075" }
       Then { result.country == "US" }
 
-      Then { result.home_phone == "(858) 555-1000" }
-      Then { result.mobile_phone == "(858) 555-1001" }
+      expected_phones = [{ type: 'mobile', number: '(858) 555-1001' }, { type: 'mobile', number: '(858) 555-1002' }, { type: 'fax', number: '(858) 123-1002' },
+                         { type: 'home', number: '(858) 555-1000' }, { type: 'home', number: '(858) 555-1003' }]
+      Then { result.phone_numbers == expected_phones }
 
       Then { result.websites == ["http://www.linkedin.com/in/johnadams"] }
-      Then { result.email == "johnadams@yamoo.com" }
-    end  
-    
+      Then { result.email_addresses == ["johnadams@yamoo.com"] }
+    end
+
     context "a sparse resume" do
       Given(:raw_xml) { File.read(File.expand_path(File.dirname(__FILE__) + '/../support/contact_information_sparse.xml')) }
       Given(:xml) { Nokogiri::XML.parse(raw_xml) }
@@ -60,14 +60,14 @@ describe Sovren::ContactInformation do
 
       Then { result.first_name == "John" }
       Then { result.last_name == "Adams" }
-      Then { result.email == "johnadams@yamoo.com" }
-    end  
+      Then { result.email_addresses == ["johnadams@yamoo.com"] }
+    end
 
     context "no contact info" do
       When(:result) { Sovren::ContactInformation.parse(nil) }
 
       Then { result == nil }
-    end  
+    end
   end
 
 end
