@@ -5,7 +5,8 @@ module Sovren
     attr_accessor :executive_summary, :objective, :contact_information, :education_history, :employment_history, :certifications, :competencies, :achievements, :associations, :languages, :military_history, :patent_history, :publication_history, :references, :experience_summary
 
     def self.parse(resume)
-      parsed_resume = Nokogiri::XML.parse(resume)
+      escaped_resume = resume.gsub(/&(?![^\s;]*;)/, '&amp;')
+      parsed_resume = Nokogiri::XML.parse(escaped_resume)
       resume = self.new
       resume.executive_summary = parsed_resume.css('ExecutiveSummary').text
       resume.objective = parsed_resume.css('Objective').text
